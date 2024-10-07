@@ -1,0 +1,21 @@
+{
+  "name": "devtinder-backend",
+  "version": "1.0.0",
+  "description": "Tinder for Devs",
+  "main": "index.js",
+  "scripts": {
+    "start":"nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "js",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "Asha Laxmi",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.0",
+    "nodemon": "^3.1.7"
+  }
+}
