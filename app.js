@@ -8,12 +8,17 @@ app.use(express.json());
 // new create request
 app.post("/signup", async (req, res) => {
 
-    // create a new instance of User model
-    const user = new User(req?.body);
-
     try {
+
+        if (updateData?.skills?.length > 10) {
+            throw new Error("only 10 skills allowed");
+        }
+
+        // create a new instance of User model
+        const user = new User(req?.body);
+
         // save the data 
-        await user.save();
+        await user.save({ runValidators: true });
         res.send("user added successfully");
     }
     catch (err) {
@@ -70,17 +75,44 @@ app.get("/feed", async (req, res) => {
 });
 
 // update an user by using id
-app.patch("/user", async (req, res) => {
-    let userId = req?.body?.id;
-    let updateData = req?.body;
-    console.log({userId,updateData});
+app.patch("/user/:userId", async (req, res) => {
+
+    console.log({INFO:"update user called"});
     
+    let userId = req?.params?.userId;
+    let updateData = req?.body;
+    updateData.modifiedAt = new Date(Date.now()).toISOString();
+
     try {
-        let user = await User.findByIdAndUpdate(userId, updateData, { returnDocument: "after" });
+
+        const RESTRICTED_UPDATE_FIELD = ["emailId"];
+
+        const isUpdateRestricted = Object.keys(updateData).every(field => {
+            RESTRICTED_UPDATE_FIELD.includes(field)
+        });
+
+        if (isUpdateRestricted) {
+            throw new Error("update not allowed");
+        }
+
+        if (!userId) {
+            throw new Error("User ID is required");
+        }
+
+        if(Array.isArray(updateData.skills) && updateData?.skills?.length > 10){
+            console.log({INFO:"validation called to check array "});
+            
+            throw new Error("only 10 skills allowed");
+        }
+
+        let user = await User.findByIdAndUpdate(userId, updateData, { returnDocument: 'after', runValidators: true });
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
         res.send(user);
     }
     catch (err) {
-        res.status(400).send("something went wrong");
+        res.status(500).send("something went wrong" + err.message);
     }
 });
 
