@@ -2,27 +2,32 @@ const express = require("express");
 const app = express();
 const { connection } = require("./config/database");
 const User = require("./model/user");
+const {signUpValidator} = require("./utils/validators");
 
 app.use(express.json());
 
 // new create request
 app.post("/signup", async (req, res) => {
 
-    try {
+    if (req?.body) {
 
-        if (updateData?.skills?.length > 10) {
-            throw new Error("only 10 skills allowed");
+        try {
+
+            signUpValidator(req);
+
+            // create a new instance of User model
+            const user = new User(req?.body);
+
+            // save the data 
+            await user.save({ runValidators: true });
+            res.send("user added successfully");
         }
-
-        // create a new instance of User model
-        const user = new User(req?.body);
-
-        // save the data 
-        await user.save({ runValidators: true });
-        res.send("user added successfully");
+        catch (err) {
+            res.status(400).send("error in creating user" + err.message);
+        }
     }
-    catch (err) {
-        res.status(400).send("error in creating user" + err.message);
+    else {
+        throw new Error("DATA_NOT_RECIEVED");
     }
 });
 
