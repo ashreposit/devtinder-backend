@@ -3,6 +3,7 @@ const app = express();
 const { connection } = require("./config/database");
 const User = require("./model/user");
 const {signUpValidator} = require("./utils/validators");
+const bcrypt = require("bcrypt");
 
 app.use(express.json());
 
@@ -15,8 +16,23 @@ app.post("/signup", async (req, res) => {
 
             signUpValidator(req);
 
+            let saltRounds=Math.floor(Math.random()* (12-8+1))+8; // generate random saltrounds between 8 - 12
+
+            let salt = await bcrypt.genSalt(saltRounds);
+            const hashedPassword = await bcrypt.hash(req.body.password,salt);
+            
             // create a new instance of User model
-            const user = new User(req?.body);
+            const user = new User({
+                firstName: req?.body?.firstName,
+                lastName: req?.body?.lastName,
+                emailId: req?.body?.emailId,
+                password: hashedPassword,
+                age : req?.body?.age,
+                gender: req?.body?.gender,
+                photoUrl: req?.body?.photoUrl,
+                about : req?.body?.about,
+                skills : req?.body?.skills 
+            });
 
             // save the data 
             await user.save({ runValidators: true });
@@ -28,6 +44,29 @@ app.post("/signup", async (req, res) => {
     }
     else {
         throw new Error("DATA_NOT_RECIEVED");
+    }
+});
+
+app.post("/signin",async (req,res)=>{
+
+    if (req?.body) {
+        try {
+            let userPassword = await User.findOne({ emailId: req.body.emailId });
+
+            if(!userPassword) throw new Error("NO_USER_FOUND");
+
+            let isValidPassword = await bcrypt.compare(req?.body?.password,userPassword?.password);
+
+            if(!isValidPassword) throw new Error("INVALID_LOGIN");
+            
+            if(isValidPassword) return true;
+        }
+        catch (err) {
+            res.status(400).send("Error " + err.message);
+        }
+    }
+    else{
+        throw new Error("REQUEST_BODY_REQUIRED");
     }
 });
 

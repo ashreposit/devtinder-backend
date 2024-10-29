@@ -6,7 +6,7 @@ const signUpValidator = function (req){
         throw new Error("only 10 skills allowed");
     }
     else if(!validator.isStrongPassword(req?.body?.password)){
-        throw new Error("Please enter a string password");
+        throw new Error("Please enter a strong password");
     }
 }
 
