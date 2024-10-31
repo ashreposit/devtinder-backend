@@ -2,10 +2,15 @@ const express = require("express");
 const app = express();
 const { connection } = require("./config/database");
 const User = require("./model/user");
-const {signUpValidator} = require("./utils/validators");
+const { signUpValidator } = require("./utils/validators");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const customEnv = require("custom-env");
+const { authenticate } = require("./middleware/auth");
+
 
 app.use(express.json());
+app.use(cookieParser());
 
 // new create request
 app.post("/signup", async (req, res) => {
@@ -16,22 +21,22 @@ app.post("/signup", async (req, res) => {
 
             signUpValidator(req);
 
-            let saltRounds=Math.floor(Math.random()* (12-8+1))+8; // generate random saltrounds between 8 - 12
+            let saltRounds = Math.floor(Math.random() * (12 - 8 + 1)) + 8; // generate random saltrounds between 8 - 12 to create unique password for every user. 
 
             let salt = await bcrypt.genSalt(saltRounds);
-            const hashedPassword = await bcrypt.hash(req.body.password,salt);
-            
+            const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
             // create a new instance of User model
             const user = new User({
                 firstName: req?.body?.firstName,
                 lastName: req?.body?.lastName,
                 emailId: req?.body?.emailId,
                 password: hashedPassword,
-                age : req?.body?.age,
+                age: req?.body?.age,
                 gender: req?.body?.gender,
                 photoUrl: req?.body?.photoUrl,
-                about : req?.body?.about,
-                skills : req?.body?.skills 
+                about: req?.body?.about,
+                skills: req?.body?.skills
             });
 
             // save the data 
@@ -47,28 +52,58 @@ app.post("/signup", async (req, res) => {
     }
 });
 
-app.post("/signin",async (req,res)=>{
+// Authentication of user by email,password and ending back jwt token
+app.post("/signin", async (req, res) => {
 
     if (req?.body) {
+
         try {
-            let userPassword = await User.findOne({ emailId: req.body.emailId });
 
-            if(!userPassword) throw new Error("NO_USER_FOUND");
+            let user = await User.findOne({ emailId: req?.body?.emailId });
 
-            let isValidPassword = await bcrypt.compare(req?.body?.password,userPassword?.password);
+            if (!user) throw new Error("NO_USER_FOUND");
 
-            if(!isValidPassword) throw new Error("INVALID_LOGIN");
-            
-            if(isValidPassword) return true;
+            if (user?.password) {
+
+                let isValidPassword = await user.validatePassword(req?.body?.password);
+
+                if (!isValidPassword) throw new Error("INVALID_LOGIN");
+
+                if (isValidPassword) {
+
+                    const token = await user.getJWT();
+
+                    res.cookie("authorizationToken", token, { maxAge: CONFIG.COOKIE_EXPIRATION, httpOnly: true, sameSite: "Strict" });
+
+                    res.send("Valid user");
+                }
+            }
+            else {
+                throw new Error("NO_USER_FOUND");
+            }
         }
         catch (err) {
-            res.status(400).send("Error " + err.message);
+            res.status(400).send("Error: " + err.message);
         }
     }
-    else{
+    else {
         throw new Error("REQUEST_BODY_REQUIRED");
     }
 });
+
+
+app.get("/profile", authenticate, async (req, res) => {
+
+    console.log({ req: req.user });
+
+});
+
+app.post("/logout", async (req, res) => {
+    res.clearCookie("authorizationToken");
+    res.send("logged out successfully...");
+})
+
+
 
 // get one user by id 
 app.get('/userbyid', async (req, res) => {
@@ -121,8 +156,8 @@ app.get("/feed", async (req, res) => {
 // update an user by using id
 app.patch("/user/:userId", async (req, res) => {
 
-    console.log({INFO:"update user called"});
-    
+    console.log({ INFO: "update user called" });
+
     let userId = req?.params?.userId;
     let updateData = req?.body;
     updateData.modifiedAt = new Date(Date.now()).toISOString();
@@ -143,9 +178,9 @@ app.patch("/user/:userId", async (req, res) => {
             throw new Error("User ID is required");
         }
 
-        if(Array.isArray(updateData.skills) && updateData?.skills?.length > 10){
-            console.log({INFO:"validation called to check array "});
-            
+        if (Array.isArray(updateData.skills) && updateData?.skills?.length > 10) {
+            console.log({ INFO: "validation called to check array " });
+
             throw new Error("only 10 skills allowed");
         }
 
@@ -161,15 +196,15 @@ app.patch("/user/:userId", async (req, res) => {
 });
 
 // update an user by using other values
-app.patch("/userupdate",async(req,res)=>{
-    let filterData=req?.body?.mail;
-    let updateData={emailId:req?.body?.emailId};
-    try{
-        let user = await User.findOneAndUpdate({emailId:filterData},updateData,{returnDocument:"after"});
+app.patch("/userupdate", async (req, res) => {
+    let filterData = req?.body?.mail;
+    let updateData = { emailId: req?.body?.emailId };
+    try {
+        let user = await User.findOneAndUpdate({ emailId: filterData }, updateData, { returnDocument: "after" });
         res.send(user);
     }
-    catch(err){
-        res.status(400).send("something went wrong"+err.message);
+    catch (err) {
+        res.status(400).send("something went wrong" + err.message);
     }
 });
 
@@ -190,8 +225,8 @@ app.delete("/user", async (req, res) => {
 
 connection().then(() => {
     console.log("successfully connected to the database...");
-    app.listen(7777, () => {
-        console.log("server running on port 7777....");
+    app.listen(CONFIG.APP_PORT || 3000, () => {
+        console.log(`server running on port ${CONFIG.APP_PORT || 3000}....`);
     });
 })
     .catch(err => {

@@ -1,26 +1,44 @@
-const adminAuth=(req,res,next)=>{
+const jwt=require("jsonwebtoken");
+const User=require("../model/user");
 
-    console.log({userName:req.query.userName});
-    
+const authenticate = async (req,res,next)=>{
 
-    if(req?.query?.userName==="Asha"){
-        res.send("Welcome Admin!");
+    let user,verfiedUser,token;
+
+    try {
+
+        token = req?.cookies?.authorizationToken;
+
+        if (!token) {
+            throw new Error("INVALID TOKEN");
+        }
+
+        if (token) {
+            
+            verfiedUser = await jwt.verify(token, CONFIG.JWT_SECRET_KEY);
+
+            if (!verfiedUser) {
+                throw new Error("AUNTHENTICATION FAILED");
+            }
+
+            if (verfiedUser) {
+
+                user = await User.findById(verfiedUser?.id);
+
+                if (!user) {
+                    throw new Error("USER NOT FOUND");
+                }
+            }
+        }
+
+        req.user = verfiedUser;
+        next();
     }
-    else{
-        res.status(401).send("You are not admin");
+    catch (error) {
+        res.status(400).send("Error: " + error.message);
     }
-    next();
-};
+}
 
-const userAuth=(req,res,next)=>{
-
-    if(req?.query?.name!=="admin"){
-        res.send("Hello user!");
-    }
-    else{
-        res.status(401).send("not a user");
-    }
-    next();
-};
-
-module.exports={adminAuth,userAuth};
+module.exports={
+    authenticate
+}

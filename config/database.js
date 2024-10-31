@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
+require("../config/config");
 
-const connection = async () => {
-    await mongoose.connect("mongodb+srv://anithaasha12:asha%402002@cluster0.ub9xu.mongodb.net/devTinder");
+const connection = async () => {    
+    await mongoose.connect(CONFIG.DATABASE_URL);
 };
 
 module.exports={connection};
