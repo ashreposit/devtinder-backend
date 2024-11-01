@@ -10,4 +10,24 @@ const signUpValidator = function (req){
     }
 }
 
-module.exports={signUpValidator};
+const updateValidator = function (req) {
+
+    const RESTRICTED_UPDATE_FIELD = ["emailId"];
+    let updateData = req?.body;
+
+    const isUpdateRestricted = Object.keys(updateData).every(field => {
+        RESTRICTED_UPDATE_FIELD.includes(field)
+    });
+
+    if (isUpdateRestricted) {
+        throw new Error("update not allowed");
+    }
+
+    if (Array.isArray(updateData.skills) && updateData?.skills?.length > 10) {
+        console.log({ INFO: "validation called to check array " });
+
+        throw new Error("only 10 skills allowed");
+    }
+}
+
+module.exports={signUpValidator,updateValidator};
