@@ -86,7 +86,7 @@ userSchema.methods.getJWT = async function () {
 
     const user = this; //gets the instance(value) of the user while logging in
 
-    const token =await jwt.sign({ id: user._id }, CONFIG.JWT_SECRET_KEY, { expiresIn: CONFIG.JWT_EXPIRATION });
+    const token = await jwt.sign({ id: user._id }, CONFIG.JWT_SECRET_KEY, { expiresIn: CONFIG.JWT_EXPIRATION });
 
     return token;
 };
@@ -97,7 +97,16 @@ userSchema.methods.validatePassword = async function (userPassword) {
     let isValidPassword = await bcrypt.compare(userPassword, user?.password);
 
     return isValidPassword;
-}
+};
+
+userSchema.methods.getResetToken = async function () {
+
+    let user = this;
+
+    let verficationToken = await jwt.sign({ id: user._id }, CONFIG.JWT_FORGOT_PASSWORD_KEY, { expiresIn: CONFIG.JWT_FORGOT_PASSWORD_EXPIRATION });
+
+    return verficationToken;
+};
 
 const User = mongoose.model("user", userSchema);
 
