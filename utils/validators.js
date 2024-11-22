@@ -8,6 +8,9 @@ const signUpValidator = function (req) {
     else if (!validator.isStrongPassword(req?.body?.password)) {
         throw new Error("Please enter a strong password");
     }
+    else{
+        return true;
+    }
 };
 
 const updateValidator = function (req) {
@@ -28,6 +31,8 @@ const updateValidator = function (req) {
 
         throw new Error("only 10 skills allowed");
     }
+
+    return true;
 };
 
 const passwordValidator = function (req) {

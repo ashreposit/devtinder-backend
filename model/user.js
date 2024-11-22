@@ -17,7 +17,7 @@ const userSchema = new Schema({
         type: String,
         required: true,
         lowercase: true,
-        unique: true,
+        unique: true, //when certain field is set as uniques,by default an index is generated which are unique.
         trim: true,
         validate(value) {
             if (!validator.isEmail(value)) {
@@ -40,11 +40,15 @@ const userSchema = new Schema({
     },
     gender: {
         type: String,
-        validate(value) {
-            if (!['male', 'female', 'other'].includes(value)) {
-                throw new Error("Gender data is invalid" + value);
-            }
+        enum: {
+            values: ['male', 'female', 'other'],
+            message: `{VALUE} must be valid`
         }
+        // validate(value) {
+        //     if (!['male', 'female', 'other'].includes(value)) {
+        //         throw new Error("Gender data is invalid" + value);
+        //     }
+        // }
     },
     photoUrl: {
         type: String,
@@ -82,6 +86,10 @@ const userSchema = new Schema({
     }
 });
 
+// compound index created to reduce time when searching for a user using both the first and last name.
+// userSchema.index({ firstName: 1, lastName: 1 });
+
+// instance method for creating new jwt token 
 userSchema.methods.getJWT = async function () {
 
     const user = this; //gets the instance(value) of the user while logging in
@@ -91,7 +99,9 @@ userSchema.methods.getJWT = async function () {
     return token;
 };
 
+// instance method for comparing the password
 userSchema.methods.validatePassword = async function (userPassword) {
+
     const user = this;
 
     let isValidPassword = await bcrypt.compare(userPassword, user?.password);
@@ -99,6 +109,7 @@ userSchema.methods.validatePassword = async function (userPassword) {
     return isValidPassword;
 };
 
+// instance method for getting jwt reset token 
 userSchema.methods.getResetToken = async function () {
 
     let user = this;
@@ -107,6 +118,15 @@ userSchema.methods.getResetToken = async function () {
 
     return verficationToken;
 };
+
+
+// pre save middleware to update the updatedAt 
+userSchema.pre('save',function(){
+
+    const user = this;
+    
+    user.updatedAt = new Date(Date.now()).toISOString();
+});
 
 const User = mongoose.model("user", userSchema);
 

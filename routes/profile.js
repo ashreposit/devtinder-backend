@@ -66,16 +66,16 @@ router.patch("/edit", authenticate, async (req, res) => {
 });
 
 // forgot password
-router.post("/forgotpassword", authenticate, async (req, res) => {
+router.post("/forgotpassword", async (req, res) => {
 
     let mailOptions = {};
 
-    let userId, user, resetToken, resetLink, transporter;
+    let emailId, user, resetToken, resetLink, transporter;
 
     try {
-        userId = req.user.id;
+        emailId = req?.body?.emailId;
 
-        user = await User.findById(userId);
+        user = await User.findOne({emailId: emailId});
 
         if (!user) {
             throw new Error("User not found");
@@ -84,8 +84,6 @@ router.post("/forgotpassword", authenticate, async (req, res) => {
         if (user) {
 
             resetToken = await user.getResetToken();
-
-            console.log({ token: resetToken });
 
             resetLink = `http://localhost:4500/profile/resetpassword/${resetToken}`;
 
@@ -174,11 +172,16 @@ router.patch("/resetpassword/:token", async (req, res) => {
 
 // delete user api
 router.delete("/delete", async (req, res) => {
+
     try {
+
         let user = await User.findByIdAndDelete(req?.body?.id);
+
         if (!user) {
+
             res.send("user already deleted");
         } else {
+            
             res.send("user deleted successfully");
         }
     }

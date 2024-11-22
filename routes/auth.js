@@ -1,5 +1,5 @@
-const express=require("express");
-const router=express.Router();
+const express = require("express");
+const router = express.Router();
 const { signUpValidator } = require("../utils/validators");
 const bcrypt = require("bcrypt");
 const User = require("../model/user");
@@ -14,32 +14,36 @@ router.post("/signup", async (req, res) => {
 
         try {
 
-            signUpValidator(req);
+            if (signUpValidator(req)) {
+                
+                let saltRounds = Math.floor(Math.random() * (12 - 8 + 1)) + 8; // generate random saltrounds between 8 - 12 to create unique password for every user. 
 
-            let saltRounds = Math.floor(Math.random() * (12 - 8 + 1)) + 8; // generate random saltrounds between 8 - 12 to create unique password for every user. 
+                let salt = await bcrypt.genSalt(saltRounds);
+                const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-            let salt = await bcrypt.genSalt(saltRounds);
-            const hashedPassword = await bcrypt.hash(req.body.password, salt);
+                // create a new instance of User model
+                const user = new User({
+                    firstName: req?.body?.firstName,
+                    lastName: req?.body?.lastName,
+                    emailId: req?.body?.emailId,
+                    password: hashedPassword,
+                    age: req?.body?.age,
+                    gender: req?.body?.gender,
+                    photoUrl: req?.body?.photoUrl,
+                    about: req?.body?.about,
+                    skills: req?.body?.skills
+                });
 
-            // create a new instance of User model
-            const user = new User({
-                firstName: req?.body?.firstName,
-                lastName: req?.body?.lastName,
-                emailId: req?.body?.emailId,
-                password: hashedPassword,
-                age: req?.body?.age,
-                gender: req?.body?.gender,
-                photoUrl: req?.body?.photoUrl,
-                about: req?.body?.about,
-                skills: req?.body?.skills
-            });
-
-            // save the data 
-            await user.save({ runValidators: true });
-            res.send("user added successfully");
+                // save the data 
+                await user.save({ runValidators: true });
+                res.send("user added successfully");
+            }
+            else {
+                throw new Error("Validation error");
+            }
         }
         catch (err) {
-            res.status(400).send("error in creating user" + err.message);
+            res.status(400).send("error in creating user : " + err.message);
         }
     }
     else {
@@ -87,10 +91,10 @@ router.post("/login", async (req, res) => {
 });
 
 // log out from application
-router.post("/logout",authenticate, async (req, res) => {
+router.post("/logout", authenticate, async (req, res) => {
 
     res.clearCookie("authorizationToken");
     res.send("logged out successfully...");
 });
 
-module.exports={router};
+module.exports = { router };
