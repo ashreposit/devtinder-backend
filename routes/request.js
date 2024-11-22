@@ -56,4 +56,42 @@ router.post('/send/:status/:userId', authenticate, async (req, res) => {
     }
 });
 
+// receiving a connection request from another user using the requestId of the connection.
+// works only when the connection status between 2 users is interested.
+router.post('/review/:status/:requestId', authenticate, async (req, res) => {
+
+    let loggedInUser = req?.user?.id;
+    let requestId = req?.params?.requestId;
+    let status = req?.params?.status;
+
+    try {
+
+        const validStatus = ['accepted', 'rejected'];
+
+        if (!validStatus.includes(status)) {
+            return res.status(400).json({message:"invalid status"});
+        }
+
+        //checking if the interested connection is already done by any user using the requestId.
+        const connectionRequest = await ConnectionRequest.findOne({
+            _id: requestId,
+            toUserId: loggedInUser,
+            status: 'interested'
+        });
+
+        if (!connectionRequest) {
+            return res.status(404).json({ message: "connection request not found" });
+        }
+
+        connectionRequest.status = status;
+
+        const connection = await connectionRequest.save();
+
+        res.json({ message: "connection added successfully", connection: connection });
+
+    } catch (err) {
+        res.status(400).send("Error: " + err.message);
+    }
+});
+
 module.exports = { router };
