@@ -15,21 +15,17 @@ const signUpValidator = function (req) {
 
 const updateValidator = function (req) {
 
-    const RESTRICTED_UPDATE_FIELD = ["emailId"];
+    const ALLOWED_UPDATE_FIELD = ["firstName", "lastName","age","gender","photoUrl","about","skills"];
     let updateData = req?.body;
 
-    const isUpdateRestricted = Object.keys(updateData).every(field => {
-        RESTRICTED_UPDATE_FIELD.includes(field)
-    });
+    for( let [key,value] of Object.entries(updateData)){
 
-    if (isUpdateRestricted) {
-        throw new Error("update not allowed");
-    }
+        if(!ALLOWED_UPDATE_FIELD.includes(key)){
+            throw new Error("update not allowed");
+        }
 
-    if (Array.isArray(updateData.skills) && updateData?.skills?.length > 10) {
-        console.log({ INFO: "validation called to check array " });
+        if(key === 'skills' && Array.isArray(value) && value.length > 10) throw new Error("only 10 skills allowed");
 
-        throw new Error("only 10 skills allowed");
     }
 
     return true;

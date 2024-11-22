@@ -33,16 +33,17 @@ router.patch("/edit", authenticate, async (req, res) => {
 
     console.log({ INFO: "update user called" });
 
-    let userId = req?.user?.userId;
+    let userId = req?.user?.id;
     let updateData = req?.body;
-    updateData.modifiedAt = new Date(Date.now()).toISOString();
 
     if (req?.body) {
         try {
 
-            if (!updateValidator(req?.body)) {
+            if (!updateValidator(req)) {
                 throw new Error("Invalid edit request")
             }
+
+            updateData.modifiedAt = new Date(Date.now()).toISOString();
 
             if (!userId) {
                 throw new Error("User ID is required");
@@ -57,7 +58,7 @@ router.patch("/edit", authenticate, async (req, res) => {
             res.json({ user: user });
         }
         catch (err) {
-            res.status(500).send("something went wrong" + err.message);
+            res.status(500).send("something went wrong " + err.message);
         }
     }
     else {
