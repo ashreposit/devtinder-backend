@@ -44,15 +44,19 @@ router.post('/send/:status/:userId', authenticate, async (req, res) => {
             });
 
             data = await connectionRequest.save();
+
+            savedRequest = await ConnectionRequest.findById(data._id)
+                .populate("toUserId", "firstName lastName age gender photoUrl about skills")
+
         }
         else {
             return res.status(400).json({ message: "connection request already exists" });
         }
 
-        res.json({ msg: "resquest Data added successfully", data: data });
+        res.json({ msg: "resquest Data added successfully", data: savedRequest });
     }
     catch (err) {
-        res.status(400).send("Error: "+err.message);
+        res.status(400).json({"Error" : err.message});
     }
 });
 
@@ -90,7 +94,7 @@ router.post('/review/:status/:requestId', authenticate, async (req, res) => {
         res.json({ message: "connection added successfully", connection: connection });
 
     } catch (err) {
-        res.status(400).send("Error: " + err.message);
+        res.status(400).json({"Error" : err.message});
     }
 });
 

@@ -5,14 +5,14 @@ POST /auth/signup //creating new urer
 POST /auth/login //logging in 
 POST /auth/logout //logging out
 
-## profileRouter ---->completed
+## profileRouter ----> completed
 GET /profile/view //viewing the profile info
 PATCH /profile/edit //editing the profile data
 PATCH /profile/password //forgot password
 DELETE /profile/delete //delete an user profile
 
 
-## requestRouter ---->completed
+## requestRouter ----> completed
 status: interested,ignorned,accept,reject
 
 POST /request/send/interested/:userId //sending connection request to another user by right swiping the profile on feed 
@@ -26,6 +26,6 @@ POST /request/review/rejected/:requestId //rejecting a request
 POST /request/review/:status/:requestId //combined api for receiving a connection request from another user only when the status of the connection request is interested
 
 ## userRequestRouter -----> in progress
-GET /user/connetions //getting all the connections 
-GET /user/requests //checking the received requests
+GET /user/connetions/received //getting all the pending received connections 
+GET /user/requests //getting all the accepted requests
 GET /user/feed //gets you the profile of other users

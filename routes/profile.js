@@ -24,7 +24,7 @@ router.get("/view", authenticate, async (req, res) => {
         }
     }
     catch (err) {
-        res.status(400).send("Error: " + err.message);
+        res.status(400).json({"Error" : err.message});
     }
 });
 
