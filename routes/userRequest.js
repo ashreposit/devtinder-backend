@@ -63,16 +63,35 @@ router.get('/requests',authenticate,async (req,res)=>{
 });
 
 // get all the users
-router.get("/feed", async (req, res) => {
+router.get("/feed",authenticate, async (req, res) => {
 
     try {
-        let userData = await User.find();
-        if (userData.length == 0) {
-            res.status(404).send("no data found");
-        }
-        else {
-            res.send(userData);
-        }
+        
+        let loggedInUser = req?.user?.id;
+        let page = req?.query ? parseInt(req.query.page) : 1;
+        let limit = req?.query ? parseInt(req.query.limit) : 10;
+        limit = limit > 50 ? 50 : limit;
+        let skip = (page - 1) * limit;
+
+        let connectionRequest = await ConnectionRequest.find({
+            $or:[
+                {fromUserId:loggedInUser},{toUserId:loggedInUser}
+            ]
+        }).select("fromUserId toUserId");
+
+        let hideUsers = new Set();
+
+        // // finding the unique user id 
+        connectionRequest.forEach((request) => {
+            hideUsers.add(request?.fromUserId.toString());
+            hideUsers.add(request?.toUserId.toString());
+        });
+
+        let users = await User.find({
+            _id: { $nin: Array.from(hideUsers),$ne: loggedInUser }
+        }).select("firstName lastName age gender photoUrl about skills").skip(skip).limit(limit);
+
+        res.status(200).json({users:users});
     }
     catch (err) {
         res.status(400).send("something went wrong");

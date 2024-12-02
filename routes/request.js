@@ -46,7 +46,7 @@ router.post('/send/:status/:userId', authenticate, async (req, res) => {
             data = await connectionRequest.save();
 
             savedRequest = await ConnectionRequest.findById(data._id)
-                .populate("toUserId", "firstName lastName age gender photoUrl about skills")
+                .populate("toUserId", "firstName lastName age gender photoUrl about skills");
 
         }
         else {
@@ -88,6 +88,7 @@ router.post('/review/:status/:requestId', authenticate, async (req, res) => {
         }
 
         connectionRequest.status = status;
+        connectionRequest.modifiedAt = new Date(Date.now()).toISOString();
 
         const connection = await connectionRequest.save();
 

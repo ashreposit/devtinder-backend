@@ -29,3 +29,13 @@ POST /request/review/:status/:requestId //combined api for receiving a connectio
 GET /user/connetions/received //getting all the pending received connections 
 GET /user/requests //getting all the accepted requests
 GET /user/feed //gets you the profile of other users
+
+feed api 
+
+user should see all the user cards except :
+1. his own card 
+2. cards of the user which he/she has sent request to 
+3. cards of the user which he/she has connected with
+4. cards of the user which he/she has ignored/rejected.
+
+skip = (page-1)*10
