@@ -36,14 +36,14 @@ router.post("/signup", async (req, res) => {
 
                 // save the data 
                 await user.save({ runValidators: true });
-                res.send("user added successfully");
+                res.json({message:"user added successfully"});
             }
             else {
                 throw new Error("Validation error");
             }
         }
         catch (err) {
-            res.status(400).send("error in creating user : " + err.message);
+            res.status(400).json({Error:"error in creating user : " + err.message});
         }
     }
     else {
@@ -74,7 +74,7 @@ router.post("/login", async (req, res) => {
 
                     res.cookie("authorizationToken", token, { maxAge: CONFIG.COOKIE_EXPIRATION, httpOnly: true, sameSite: "Strict" });
 
-                    res.send("Valid user");
+                    res.json({message:"Valid user"});
                 }
             }
             else {
@@ -82,11 +82,11 @@ router.post("/login", async (req, res) => {
             }
         }
         catch (err) {
-            res.status(400).send("Error: " + err.message);
+            res.status(400).json({Error: err.message});
         }
     }
     else {
-        throw new Error("REQUEST_BODY_REQUIRED");
+        res.status(400).json({message:"REQUEST_BODY_REQUIRED"});
     }
 });
 
@@ -94,7 +94,7 @@ router.post("/login", async (req, res) => {
 router.post("/logout", authenticate, async (req, res) => {
 
     res.clearCookie("authorizationToken");
-    res.send("logged out successfully...");
+    res.json({message:"logged out successfully..."});
 });
 
 module.exports = { router };

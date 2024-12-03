@@ -20,7 +20,7 @@ router.get("/view", authenticate, async (req, res) => {
         }
 
         if (userProfile) {
-            res.send(userProfile);
+            res.json({userProfile:userProfile});
         }
     }
     catch (err) {
@@ -52,17 +52,17 @@ router.patch("/edit", authenticate, async (req, res) => {
             let user = await User.findByIdAndUpdate(userId, updateData, { returnDocument: 'after', runValidators: true });
 
             if (!user) {
-                return res.status(404).send("User not found");
+                return res.status(404).json({message:"User not found"});
             }
 
             res.json({ user: user });
         }
         catch (err) {
-            res.status(500).send("something went wrong " + err.message);
+            res.status(500).json({Error:"something went wrong " + err.message});
         }
     }
     else {
-        res.status(400).send("DATA NOT RECEIVED");
+        res.status(400).json({Error:"DATA NOT RECEIVED"});
     }
 });
 
@@ -99,7 +99,7 @@ router.post("/forgotpassword", async (req, res) => {
             if (transporter) {
 
                 mailOptions = {
-                    from: `Asha Laxmi <anithaasha12@gmail.com>`,
+                    from: `DEV-TINDER <devtinder@gmail.com>`,
                     to: "anithaasha12@gmail.com",
                     subject: "Password Reset Request",
                     text: `Click the link to reset your password: ${resetLink}`,
@@ -120,7 +120,7 @@ router.post("/forgotpassword", async (req, res) => {
         }
     }
     catch (err) {
-        res.status(400).send("Error " + err.message);
+        res.status(400).json({Error: err.message});
     }
 });
 
@@ -166,7 +166,7 @@ router.patch("/resetpassword/:token", async (req, res) => {
             }
         }
     } catch (err) {
-        res.status(400).send("error " + err.message);
+        res.status(400).json({Error:err.message});
     }
 
 });
@@ -180,14 +180,14 @@ router.delete("/delete", async (req, res) => {
 
         if (!user) {
 
-            res.send("user already deleted");
+            res.json({message:"user already deleted"});
         } else {
             
-            res.send("user deleted successfully");
+            res.json({message:"user deleted successfully"});
         }
     }
     catch (err) {
-        res.status(400).send("something went wrong");
+        res.status(400).json({Error:"something went wrong"});
     }
 });
 
