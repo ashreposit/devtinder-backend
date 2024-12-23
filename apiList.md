@@ -39,3 +39,6 @@ user should see all the user cards except :
 4. cards of the user which he/she has ignored/rejected.
 
 skip = (page-1)*10
+
+
+cors error -- > install cors , add it in the app.js , while using axios in frontend to fetch the data from backend add ==> withCredentials:true

@@ -74,7 +74,9 @@ router.post("/login", async (req, res) => {
 
                     res.cookie("authorizationToken", token, { maxAge: CONFIG.COOKIE_EXPIRATION, httpOnly: true, sameSite: "Strict" });
 
-                    res.json({message:"Valid user"});
+                    let userData = { firstName: user.firstName, lastName: user.lastName, age: user.age, gender: user.gender, photoUrl: user.photoUrl, about: user.about, skills: user.skills };
+
+                    res.json({message:"signin successful",user: userData});
                 }
             }
             else {

@@ -4,6 +4,7 @@ const { connection } = require("./config/database");
 const User = require("./model/user");
 const cookieParser = require("cookie-parser");
 const customEnv=require("custom-env");
+const cors = require("cors");
 require("./config/config");
 
 const authRouter=require("./routes/auth");
@@ -11,6 +12,10 @@ const requestRouter=require("./routes/request");
 const profileRouter=require("./routes/profile");
 const userRequestRouter=require("./routes/userRequest");
 
+app.use(cors({
+    origin:"http://localhost:5173",
+    credentials:true
+}));
 app.use(express.json());
 app.use(cookieParser());
 
