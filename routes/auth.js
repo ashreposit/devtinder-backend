@@ -54,6 +54,8 @@ router.post("/signup", async (req, res) => {
 // Authentication of user by email,password and ending back jwt token
 router.post("/login", async (req, res) => {    
 
+    console.log({INFO:"log in function called"});
+
     if (req?.body) {
 
         try {
@@ -94,7 +96,7 @@ router.post("/login", async (req, res) => {
 
 // log out from application
 router.post("/logout", authenticate, async (req, res) => {
-
+    console.log({INFO:"logout function called"});
     res.clearCookie("authorizationToken");
     res.json({message:"logged out successfully..."});
 });
