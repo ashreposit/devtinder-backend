@@ -19,8 +19,11 @@ router.get("/view", authenticate, async (req, res) => {
             throw new Error("NO USER FOUND");
         }
 
-        if (userProfile) {
-            res.json({userProfile:userProfile});
+        if (userProfile?._id) {
+
+            let userData = { firstName: userProfile.firstName, lastName: userProfile.lastName, age: userProfile.age, gender: userProfile.gender, photoUrl: userProfile.photoUrl, about: userProfile.about, skills: userProfile.skills,emailId:userProfile.emailId,password:userProfile.password };
+
+            res.json({success:true,userProfile:userData});
         }
     }
     catch (err) {

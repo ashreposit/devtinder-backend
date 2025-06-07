@@ -10,7 +10,7 @@ const authenticate = async (req,res,next)=>{
         token = req?.cookies?.authorizationToken;
 
         if (!token) {
-            throw new Error("INVALID TOKEN");
+            return res.status(401).send('unauthorized! please login');
         }
 
         if (token) {
