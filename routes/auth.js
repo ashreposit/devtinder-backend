@@ -98,7 +98,7 @@ router.post("/login", async (req, res) => {
 router.post("/logout", authenticate, async (req, res) => {
     console.log({INFO:"logout function called"});
     res.clearCookie("authorizationToken");
-    res.json({message:"logged out successfully..."});
+    res.status(200).json({message:"logged out successfully..."});
 });
 
 module.exports = { router };
