@@ -17,10 +17,6 @@ router.get('/connections/received',authenticate,async (req,res)=>{
             status : 'interested'
         }).populate("fromUserId",POPULATE_USER_DATA);
 
-        if(connectionRequests.length <= 0 ){
-            return res.status(400).json({message: 'no pending connection requests'});
-        }
-
         res.status(200).json({message: 'connection requests fetched successfully', connectionRequests: connectionRequests});
 
     } catch (err) {

@@ -54,11 +54,13 @@ router.patch("/edit", authenticate, async (req, res) => {
 
             let user = await User.findByIdAndUpdate(userId, updateData, { returnDocument: 'after', runValidators: true });
 
+            let userData = { _id:user?._id,firstName: user.firstName, lastName: user.lastName, age: user.age, gender: user.gender, photoUrl: user.photoUrl, about: user.about, skills: user.skills,emailId:user.emailId,password:user.password };
+
             if (!user) {
                 return res.status(404).json({message:"User not found"});
             }
 
-            res.json({ user: user });
+            res.json({ user: userData });
         }
         catch (err) {
             res.status(500).json({Error:"something went wrong " + err.message});
