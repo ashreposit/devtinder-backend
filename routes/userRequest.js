@@ -7,7 +7,7 @@ const ConnectionRequest = require("../model/connectionRequest");
 const POPULATE_USER_DATA ="firstName lastName age gender photoUrl about skills";
 
 //getting all the pending connection requests for the logged in user
-router.get('/connections/received',authenticate,async (req,res)=>{
+router.get('/request/received',authenticate,async (req,res)=>{
     try {
         
         let loggedInUser = req?.user?.id;
@@ -26,7 +26,7 @@ router.get('/connections/received',authenticate,async (req,res)=>{
 
 
 //getting all the accepted connections of the logged in user
-router.get('/requests',authenticate,async (req,res)=>{
+router.get('/connections',authenticate,async (req,res)=>{
 
     try {
 
@@ -42,9 +42,9 @@ router.get('/requests',authenticate,async (req,res)=>{
                     ]
                 }]
         }).populate("fromUserId", POPULATE_USER_DATA).populate("toUserId", POPULATE_USER_DATA);
-        
+
         const connectionData = connectionRequests.map((data) => {
-            if (data.fromUserId.equals(loggedInUser.id)) {
+            if (data.fromUserId._id.equals(loggedInUser)) {
                 return data.toUserId;
             }
             return data.fromUserId;
