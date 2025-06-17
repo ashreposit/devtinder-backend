@@ -91,7 +91,7 @@ router.get("/feed",authenticate, async (req, res) => {
             _id: { $nin: Array.from(hideUsers),$ne: loggedInUser }
         }).select("firstName lastName age gender photoUrl about skills").skip(skip).limit(limit);
 
-        res.status(200).json({users:users});
+        res.status(200).json({mesasge:"getAllFeed successful",feed:users});
     }
     catch (err) {
         res.status(400).send("something went wrong");
