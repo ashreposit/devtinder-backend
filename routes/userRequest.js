@@ -44,10 +44,12 @@ router.get('/connections',authenticate,async (req,res)=>{
         }).populate("fromUserId", POPULATE_USER_DATA).populate("toUserId", POPULATE_USER_DATA);
 
         const connectionData = connectionRequests.map((data) => {
+            const connectionId = data._id;
+
             if (data.fromUserId._id.equals(loggedInUser)) {
-                return data.toUserId;
+                return {...data.toUserId.toObject(),connectionId:connectionId};
             }
-            return data.fromUserId;
+            return {...data.fromUserId.toObject(),connectionId:connectionId};
         }
         );
         
@@ -55,6 +57,23 @@ router.get('/connections',authenticate,async (req,res)=>{
         
     } catch (err) {
         res.status(400).json({message: err.message});
+    }
+});
+
+// deleting the connection request.
+router.delete('/connections/:connectionId',async(req,res)=>{
+
+    let connectionId = req?.params?.connectionId;
+
+    try {
+        
+        const connections = await ConnectionRequest.deleteOne({_id:connectionId});
+
+        if(connections?.deletedCount === 1){
+            res.status(200).json({message:"Connection delected successfully"});
+        }
+    } catch (error) {
+        res.status(400).json({message:error.message});
     }
 });
 
