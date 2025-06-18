@@ -71,9 +71,9 @@ const userSchema = new Schema({
                 throw new Error("Skills should be an array" + value);
             }
 
-            if (value.length === 0) {
-                throw new Error("the array is empty " + value);
-            }
+            // if (value.length === 0) {
+            //     throw new Error("the array is empty " + value);
+            // }
         }
     },
     createdAt: {

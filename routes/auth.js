@@ -27,16 +27,20 @@ router.post("/signup", async (req, res) => {
                     lastName: req?.body?.lastName,
                     emailId: req?.body?.emailId,
                     password: hashedPassword,
-                    age: req?.body?.age,
-                    gender: req?.body?.gender,
+                    age: req?.body?.age ?? null,
+                    gender: req?.body?.gender ?? null,
                     photoUrl: req?.body?.photoUrl,
                     about: req?.body?.about,
-                    skills: req?.body?.skills
+                    skills: req?.body?.skills ?? []
                 });
 
                 // save the data 
-                await user.save({ runValidators: true });
-                res.json({message:"user added successfully"});
+                const savedUser = await user.save({ runValidators: true });
+                const token = await savedUser.getJWT();
+
+                res.cookie("authorizationToken", token, { maxAge: CONFIG.COOKIE_EXPIRATION, httpOnly: true, sameSite: "Strict" });
+
+                res.status(200).json({message:"user added successfully",User:savedUser});
             }
             else {
                 throw new Error("Validation error");
