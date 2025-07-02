@@ -4,6 +4,8 @@ const { authenticate } = require("../middleware/auth");
 const ConnectionRequest = require('../model/connectionRequest');
 const User = require('../model/user');
 
+const sendEmail = require('../utils/sendEmail');
+
 
 //sending a connection request to a user
 router.post('/send/:status/:userId', authenticate, async (req, res) => {
@@ -44,6 +46,10 @@ router.post('/send/:status/:userId', authenticate, async (req, res) => {
             });
 
             data = await connectionRequest.save();
+
+            let emailResponse = await sendEmail.run(`Connection request sent to ${validToUser.firstName +' '+ validToUser.lastName}`);
+
+            console.log(emailResponse);
 
             savedRequest = await ConnectionRequest.findById(data._id)
                 .populate("toUserId", "firstName lastName age gender photoUrl about skills");
