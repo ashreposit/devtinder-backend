@@ -14,7 +14,7 @@ const createSendEmailCommand = (toAddress, fromAddress,requestMessage) => {
       Body: {
         Html: {
           Charset: "UTF-8",
-          Data: `${requestMessage}`,
+          Data: `${requestMessage?.body}`,
         },
         Text: {
           Charset: "UTF-8",
@@ -23,7 +23,7 @@ const createSendEmailCommand = (toAddress, fromAddress,requestMessage) => {
       },
       Subject: {
         Charset: "UTF-8",
-        Data: "Connection Request Info",
+        Data: `${requestMessage?.subject}`,
       },
     },
     Source: fromAddress,

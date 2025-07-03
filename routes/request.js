@@ -47,7 +47,7 @@ router.post('/send/:status/:userId', authenticate, async (req, res) => {
 
             data = await connectionRequest.save();
 
-            let emailResponse = await sendEmail.run(`Connection request sent to ${validToUser.firstName +' '+ validToUser.lastName}`);
+            let emailResponse = await sendEmail.run({subject:'connection request send sucessfully',body:`Connection request sent to ${validToUser.firstName +' '+ validToUser.lastName}`});
 
             console.log(emailResponse);
 

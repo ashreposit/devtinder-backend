@@ -12,6 +12,8 @@ const requestRouter=require("./routes/request");
 const profileRouter=require("./routes/profile");
 const userRequestRouter=require("./routes/userRequest");
 
+require('./utils/cronjob');
+
 app.use(cors({
     origin:"http://localhost:5173",
     credentials:true
