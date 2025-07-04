@@ -47,7 +47,7 @@ router.post('/createOrder', authenticate, async (req, res) => {
 // webhookapi endpoint which return whether the payment succeded or failed.
 router.post('/payment/webhook',async(req,res)=>{
     try {
-        const webhookSignature = req.headers["X-Razorpay-Signature"];
+        const webhookSignature = req.get("X-Razorpay-Signature");
 
         const isValidatedsignature = validateWebhookSignature(JSON.stringify(req.body), webhookSignature, CONFIG.RAZORPAY_WEBHOOK_SECRET);
 
