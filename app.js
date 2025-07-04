@@ -11,6 +11,7 @@ const authRouter=require("./routes/auth");
 const requestRouter=require("./routes/request");
 const profileRouter=require("./routes/profile");
 const userRequestRouter=require("./routes/userRequest");
+const paymentRouter = require("./routes/payment");
 
 require('./utils/cronjob');
 
@@ -25,7 +26,7 @@ app.use('/auth',authRouter.router);
 app.use('/request',requestRouter.router);
 app.use('/profile',profileRouter.router);
 app.use('/user',userRequestRouter.router);
-
+app.use('/payment',paymentRouter.router);
 
 connection().then(() => {
     console.log("successfully connected to the database...");
