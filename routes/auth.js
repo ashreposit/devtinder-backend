@@ -80,7 +80,7 @@ router.post("/login", async (req, res) => {
 
                     res.cookie("authorizationToken", token, { maxAge: CONFIG.COOKIE_EXPIRATION, httpOnly: true, sameSite: "Strict" });
 
-                    let userData = { firstName: user.firstName, lastName: user.lastName, age: user.age, gender: user.gender, photoUrl: user.photoUrl, about: user.about, skills: user.skills };
+                    let userData = { firstName: user.firstName, lastName: user.lastName, age: user.age, gender: user.gender, photoUrl: user.photoUrl, about: user.about, skills: user.skills,isPremium:user.isPremium};
 
                     res.json({message:"signin successful",user: userData});
                 }

@@ -78,4 +78,11 @@ router.post('/payment/webhook',async(req,res)=>{
     }
 });
 
+// To check if the user is premium user
+router.get('/verify/premium',authenticate,async(req,res)=>{
+    const User = req.user.toJSON();
+    if(User.isPremium) return res.status(200).json({isPremium:true});
+    res.status(200).json({isPremium:true});
+});
+
 module.exports = { router };
