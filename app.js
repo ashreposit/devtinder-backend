@@ -13,6 +13,7 @@ const requestRouter=require("./routes/request");
 const profileRouter=require("./routes/profile");
 const userRequestRouter=require("./routes/userRequest");
 const paymentRouter = require("./routes/payment");
+const chatRouter = require("./routes/chat");
 const socketConfig = require("./utils/socket");
 
 require('./utils/cronjob');
@@ -29,6 +30,7 @@ app.use('/request',requestRouter.router);
 app.use('/profile',profileRouter.router);
 app.use('/user',userRequestRouter.router);
 app.use('/payment',paymentRouter.router);
+app.use('/chat',chatRouter.router);
 
 const server = http.createServer(app);
 socketConfig.initializeSocket(server);
